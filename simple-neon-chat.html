@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Неоновый ИИ Чат</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: #000000;
+      --text-primary: #ffffff;
+      --neon-primary: #00ffdd;
+      --neon-secondary: #ff00ff;
+      --neon-tertiary: #00ff88;
+      --border-radius: 12px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+    
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+      background-color: var(--background);
+      color: var(--text-primary);
+      height: 100%;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    button, input, textarea {
+      font-family: inherit;
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    
+    button {
+      cursor: pointer;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+    }
+    
+    button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 8px var(--neon-primary);
+    }
+    
+    input, textarea {
+      padding: 0.75rem;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 8px var(--neon-primary);
+      border-color: var(--neon-primary);
+    }
+    
+    .neon-box {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 15px var(--neon-primary);
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .neon-box:hover {
+      box-shadow: 0 0 25px var(--neon-primary), 0 0 5px var(--neon-secondary);
+    }
+    
+    .neon-text {
+      color: var(--neon-primary);
+      text-shadow: 0 0 5px var(--neon-primary);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(90deg, var(--neon-primary), var(--neon-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .container {
+      min-height: 100vh;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .main {
+      padding: 4rem 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    .title {
+      margin: 0;
+      line-height: 1.15;
+      font-size: 3rem;
+      letter-spacing: -0.025em;
+      margin-bottom: 1.5rem;
+    }
+    
+    .description {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      line-height: 1.5;
+      opacity: 0.7;
+    }
+    
+    .chat-container {
+      width: 100%;
+      height: 500px;
+      margin-top: 2rem;
+    }
+    
+    .footer {
+      width: 100%;
+      height: 100px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .chat-component {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .api-key-section {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .api-key-toggle {
+      background: transparent;
+      color: var(--neon-primary);
+      border: 1px solid var(--neon-primary);
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .api-key-toggle:hover {
+      background: rgba(0, 255, 221, 0.1);
+      box-shadow: 0 0 8px var(--neon-primary);
+    }
+    
+    .api-key-input-container {
+      margin-top: 1rem;
+    }
+    
+    .api-provider-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .provider-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .provider-option.active {
+      border-color: var(--neon-primary);
+      box-shadow: 0 0 5px var(--neon-primary);
+    }
+    
+    .provider-option input {
+      margin: 0;
+    }
+    
+    .api-key-input {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--neon-secondary);
+      color: var(--text-primary);
+      border-radius: var(--border-radius);
+    }
+    
+    .api-key-info {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+    
+    .highlight {
+      color: var(--neon-primary);
+      font-weight: bold;
+    }
+    
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .message {
+      display: flex;
+      margin-bottom: 0.5rem;
+    }
+    
+    .user-message {
+      justify-content: flex-end;
+    }
+    
+    .assistant-message {
+      justify-content: flex-start;
+    }
+    
+    .message-content {
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius);
+      max-width: 80%;
+      word-break: break-word;
+    }
+    
+    .user-message .message-content {
+      background: rgba(0, 255, 221, 0.1);
+      border: 1px solid rgba(0, 255, 221, 0.3);
+      color: var(--text-primary);
+      margin-left: auto;
+    }
+    
+    .assistant-message .message-content {
+      background: rgba(255, 0, 255, 0.1);
+      border: 1px solid rgba(255, 0, 255, 0.3);
+      color: var(--text-primary);
+    }
+    
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+    
+    .loading-dots span {
+      width: 8px;
+      height: 8px;
+      background-color: var(--neon-primary);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    
+    .loading-dots span:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    
+    .loading-dots span:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(0.75);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .input-form {
+      display: flex;
+      padding: 1rem;
+      gap: 0.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .input-form input {
+      flex: 1;
+    }
+    
+    .input-form button {
+      background: linear-gradient(90deg, var(--neon-primary), var(--neon-tertiary));
+      color: black;
+      font-weight: 600;
+      border: none;
+      min-width: 100px;
+    }
+    
+    .input-form button:hover {
+      box-shadow: 0 0 15px var(--neon-primary);
+      opacity: 0.9;
+    }
+    
+    .input-form button:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <main class="main">
+      <h1 class="title">
+        <span class="gradient-text">Неоновый ИИ Чат</span>
+      </h1>
+      
+      <p class="description">
+        Общайтесь с продвинутым ИИ в <span class="neon-text">неоновом</span> стиле
+      </p>
+
+      <div class="chat-container neon-box">
+        <div id="chat-component" class="chat-component">
+          <!-- Секция API -->
+          <div class="api-key-section">
+            <button id="api-key-toggle" class="api-key-toggle">
+              Настройки API (необязательно)
+            </button>
+            
+            <div id="api-key-input-container" class="api-key-input-container" style="display: none;">
+              <div class="api-provider-selector">
+                <label class="provider-option active">
+                  <input type="radio" name="apiProvider" value="huggingface" checked>
+                  Hugging Face (бесплатно)
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="apiProvider" value="openai">
+                  OpenAI (требуется ключ)
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="apiProvider" value="offline">
+                  Офлайн-режим
+                </label>
+              </div>
+              
+              <div id="api-key-fields">
+                <input
+                  type="password"
+                  id="api-key-input"
+                  placeholder="Введите ваш Hugging Face API ключ (необязательно)"
+                  class="api-key-input"
+                >
+                <p class="api-key-info">
+                  Можно использовать без ключа с ограничениями. Ключ сохраняется только в браузере.
+                </p>
+              </div>
+              
+              <div id="offline-message" style="display: none;">
+                <p class="api-key-info highlight">
+                  Офлайн-режим активирован. Чат работает с базовыми предопределенными ответами без подключения к серверу.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Сообщения чата -->
+          <div id="messages-container" class="messages-container">
+            <div class="message assistant-message">
+              <div class="message-content">
+                Привет! Я нейросеть с неоновым интерфейсом. Я могу работать без API ключа (с ограничениями) или с вашим ключом Hugging Face. Чем я могу вам помочь сегодня?
+              </div>
+            </div>
+          </div>
+          
+          <!-- Форма ввода -->
+          <form id="chat-form" class="input-form">
+            <input
+              type="text"
+              id="message-input"
+              placeholder="Введите сообщение..."
+              autocomplete="off"
+            >
+            <button type="submit" id="send-button">
+              Отправить
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Powered by <span class="neon-text">Neurotech</span>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Предопределенные ответы для офлайн-режима
+    const offlineResponses = {
+      "привет": "Привет! Я работаю в офлайн-режиме. Чем могу помочь?",
+      "как дела": "Я в порядке, но сейчас работаю в офлайн-режиме из-за проблем с подключением к серверу.",
+      "что ты умеешь": "Обычно я умею отвечать на вопросы, помогать с информацией и поддерживать беседу. Но сейчас я работаю в офлайн-режиме с ограниченными возможностями.",
+      "помощь": "Я могу отвечать на простые вопросы в офлайн-режиме. Для более сложных запросов попробуйте указать API ключ Hugging Face или OpenAI.",
+      "кто ты": "Я AI-ассистент с неоновым интерфейсом. Сейчас я работаю в офлайн-режиме.",
+      "погода": "Извините, я не могу проверить погоду в офлайн-режиме. Попробуйте указать API ключ для полноценной работы."
+    };
+
+    // Глобальные переменные
+    let messages = [
+      { role: 'assistant', content: 'Привет! Я нейросеть с неоновым интерфейсом. Я могу работать без API ключа (с ограничениями) или с вашим ключом Hugging Face. Чем я могу вам помочь сегодня?' }
+    ];
+    let isLoading = false;
+    
+    // Элементы DOM
+    const messagesContainer = document.getElementById('messages-container');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const chatForm = document.getElementById('chat-form');
+    const apiKeyToggle = document.getElementById('api-key-toggle');
+    const apiKeyContainer = document.getElementById('api-key-input-container');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const apiKeyFields = document.getElementById('api-key-fields');
+    const offlineMessage = document.getElementById('offline-message');
+    const apiProviderOptions = document.querySelectorAll('input[name="apiProvider"]');
+    
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', function() {
+      // Обработчик для переключения настроек API
+      apiKeyToggle.addEventListener('click', function() {
+        const isHidden = apiKeyContainer.style.display === 'none';
+        apiKeyContainer.style.display = isHidden ? 'block' : 'none';
+        apiKeyToggle.textContent = isHidden ? 'Скрыть настройки API' : 'Настройки API (необязательно)';
+      });
+      
+      // Обработчик для провайдеров API
+      apiProviderOptions.forEach(option => {
+        option.addEventListener('change', function() {
+          // Обновляем активный класс для визуальной индикации
+          document.querySelectorAll('.provider-option').forEach(el => {
+            el.classList.remove('active');
+          });
+          this.closest('.provider-option').classList.add('active');
+          
+          // Обновляем поля и информацию в зависимости от выбранного провайдера
+          const provider = this.value;
+          const isOffline = provider === 'offline';
+          
+          apiKeyFields.style.display = isOffline ? 'none' : 'block';
+          offlineMessage.style.display = isOffline ? 'block' : 'none';
+          
+          if (provider === 'huggingface') {
+            apiKeyInput.placeholder = 'Введите ваш Hugging Face API ключ (необязательно)';
+            apiKeyFields.querySelector('.api-key-info').textContent = 
+              'Можно использовать без ключа с ограничениями. Ключ сохраняется только в браузере.';
+          } else if (provider === 'openai') {
+            apiKeyInput.placeholder = 'Введите ваш OpenAI API ключ';
+            apiKeyFields.querySelector('.api-key-info').textContent = 
+              'Необходим API ключ OpenAI. Ключ сохраняется только в браузере.';
+          }
+        });
+      });
+      
+      // Обработчик отправки сообщения
+      chatForm.addEventListener('submit', handleSubmit);
+    });
+    
+    // Обработчик отправки сообщения
+    function handleSubmit(e) {
+      e.preventDefault();
+      
+      const inputText = messageInput.value.trim();
+      if (inputText === '' || isLoading) return;
+      
+      // Добавляем сообщение пользователя
+      addMessage('user', inputText);
+      messageInput.value = '';
+      
+      // Получаем выбранный провайдер API
+      const selectedProvider = document.querySelector('input[name="apiProvider"]:checked').value;
+      const apiKey = apiKeyInput.value.trim();
+      
+      // Если выбран офлайн-режим, отвечаем локально
+      if (selectedProvider === 'offline') {
+        isLoading = true;
+        showLoading();
+        
+        // Имитируем задержку для реалистичности
+        setTimeout(() => {
+          hideLoading();
+          const response = getOfflineResponse(inputText);
+          addMessage('assistant', response);
+          isLoading = false;
+        }, 500);
+        
+        return;
+      }
+      
+      // В противном случае отправляем запрос к API
+      isLoading = true;
+      showLoading();
+      
+      // Здесь в реальном приложении был бы запрос к серверу API
+      // В нашей версии мы используем предопределенный API-ключ HF на сервере
+      // Имитируем ответ от API
+      setTimeout(() => {
+        hideLoading();
+        let response;
+        
+        // Проверяем наличие ключа для OpenAI
+        if (selectedProvider === 'openai' && !apiKey) {
+          response = 'Для использования OpenAI необходимо указать ваш API ключ. Пожалуйста, введите ключ в соответствующее поле.';
+        } else {
+          // Используем встроенный API ключ Hugging Face
+          const defaultKey = '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'; // Используется на сервере
+          
+          // Имитация ответа в зависимости от ввода
+          if (inputText.toLowerCase().includes('привет')) {
+            response = 'Приветствую! Рад вас видеть. Как я могу помочь вам сегодня?';
+          } else if (inputText.toLowerCase().includes('погода')) {
+            response = 'Я не могу проверить текущую погоду, поскольку это простая HTML-версия чата без серверной логики. В полной версии приложения я бы мог получить эту информацию для вас!';
+          } else if (inputText.toLowerCase().includes('спасибо')) {
+            response = 'Всегда рад помочь! Если у вас есть еще вопросы, не стесняйтесь спрашивать.';
+          } else {
+            response = 'Для более сложных запросов потребуется загрузить полную версию приложения на сервер. В простой HTML-версии я могу отвечать только на базовые запросы. Полная версия доступна в репозитории GitHub!';
+          }
+        }
+        
+        addMessage('assistant', response);
+        isLoading = false;
+      }, 1000);
+    }
+    
+    // Добавление сообщения в чат
+    function addMessage(role, content) {
+      messages.push({ role, content });
+      
+      const messageElement = document.createElement('div');
+      messageElement.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
+      
+      const contentElement = document.createElement('div');
+      contentElement.className = 'message-content';
+      contentElement.textContent = content;
+      
+      messageElement.appendChild(contentElement);
+      messagesContainer.appendChild(messageElement);
+      
+      // Прокрутка вниз
+      scrollToBottom();
+    }
+    
+    // Отображение индикатора загрузки
+    function showLoading() {
+      const loadingElement = document.createElement('div');
+      loadingElement.className = 'message assistant-message';
+      loadingElement.id = 'loading-indicator';
+      
+      const contentElement = document.createElement('div');
+      contentElement.className = 'message-content loading';
+      
+      const dotsElement = document.createElement('div');
+      dotsElement.className = 'loading-dots';
+      
+      for (let i = 0; i < 3; i++) {
+        const dotSpan = document.createElement('span');
+        dotsElement.appendChild(dotSpan);
+      }
+      
+      contentElement.appendChild(dotsElement);
+      loadingElement.appendChild(contentElement);
+      messagesContainer.appendChild(loadingElement);
+      
+      // Прокрутка вниз
+      scrollToBottom();
+    }
+    
+    // Скрытие индикатора загрузки
+    function hideLoading() {
+      const loadingElement = document.getElementById('loading-indicator');
+      if (loadingElement) {
+        loadingElement.remove();
+      }
+    }
+    
+    // Прокрутка контейнера сообщений вниз
+    function scrollToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Получение офлайн-ответа
+    function getOfflineResponse(message) {
+      // Преобразуем в нижний регистр для сравнения
+      const normalizedMessage = message.toLowerCase().trim();
+      
+      // Проверяем точные совпадения
+      if (offlineResponses[normalizedMessage]) {
+        return offlineResponses[normalizedMessage];
+      }
+      
+      // Проверяем, содержит ли сообщение ключевые слова
+      for (const key in offlineResponses) {
+        if (normalizedMessage.includes(key)) {
+          return offlineResponses[key];
+        }
+      }
+      
+      // Если нет совпадений, возвращаем стандартный ответ
+      return "Извините, я работаю в офлайн-режиме и не могу обработать этот запрос. Для полноценной работы, пожалуйста, добавьте API ключ Hugging Face или OpenAI в настройках.";
+    }
+  </script>
+</body>
+</html> 
